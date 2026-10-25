@@ -1911,6 +1911,11 @@ class PlaybackService : MediaSessionService() {
         videoId: String,
         target: TrackMatcher.Target,
     ): Resolved {
+        // "Revert to original": the listener pinned this track to YouTube's own
+        // copy, so no substitute is looked up for it.
+        if (AppSettings.isOriginalSource(videoId)) {
+            return Resolved.YouTube(StreamResolver.resolve(videoId))
+        }
         // A substitute already broke this track once — see
         // [StreamChoice.refuseSubstitutes]. Racing the modules again would find
         // the same catalogue holding the same unplayable URL, so there is

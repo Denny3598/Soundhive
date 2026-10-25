@@ -279,6 +279,12 @@ object AppSettings {
     /** Filters out ringtones, alarms, notifications, podcasts and short recordings from local music. */
     val filterNonMusicAudio = MutableStateFlow(true)
 
+    /**
+     * YouTube video ids the listener pinned to YouTube's own copy ("Revert to
+     * original"). Playback of these skips the substitute lookup entirely.
+     */
+    val originalSourceTracks = MutableStateFlow<Set<String>>(emptySet())
+
     /** Folder URI selected by the user for local music files, or empty for all device storage. */
     val localMusicFolderUri = MutableStateFlow("")
 
@@ -487,6 +493,7 @@ object AppSettings {
         forceMeteredConnection.value = prefs.getBoolean(KEY_FORCE_METERED, false)
         replayGenres.value = prefs.getBoolean(KEY_REPLAY_GENRES, true)
         filterNonMusicAudio.value = prefs.getBoolean(KEY_FILTER_NON_MUSIC_AUDIO, true)
+        originalSourceTracks.value = prefs.getStringSet(KEY_ORIGINAL_SOURCE_TRACKS, emptySet()).orEmpty().toSet()
         localMusicFolderUri.value = prefs.getString(KEY_LOCAL_MUSIC_FOLDER_URI, "").orEmpty()
         lastfmEnabled.value = prefs.getBoolean(KEY_LASTFM_ENABLED, false)
         lastfmUsername.value = prefs.getString(KEY_LASTFM_USERNAME, "").orEmpty()
@@ -923,6 +930,14 @@ object AppSettings {
         prefs.edit().putBoolean(KEY_REPLAY_GENRES, value).apply()
     }
 
+    fun isOriginalSource(videoId: String): Boolean = videoId in originalSourceTracks.value
+
+    fun setOriginalSource(videoId: String, original: Boolean) {
+        val next = if (original) originalSourceTracks.value + videoId else originalSourceTracks.value - videoId
+        originalSourceTracks.value = next
+        prefs.edit().putStringSet(KEY_ORIGINAL_SOURCE_TRACKS, next.toSet()).apply()
+    }
+
     fun setFilterNonMusicAudio(value: Boolean) {
         filterNonMusicAudio.value = value
         prefs.edit().putBoolean(KEY_FILTER_NON_MUSIC_AUDIO, value).apply()
@@ -1251,6 +1266,7 @@ object AppSettings {
     private const val KEY_LYRICS_SYNC_OFFSET = "lyrics_sync_offset_ms"
     private const val KEY_REPLAY_GENRES = "replay_genres"
     private const val KEY_FILTER_NON_MUSIC_AUDIO = "filter_non_music_audio"
+    private const val KEY_ORIGINAL_SOURCE_TRACKS = "original_source_tracks"
     private const val KEY_LOCAL_MUSIC_FOLDER_URI = "local_music_folder_uri"
     private const val KEY_FORCE_METERED = "force_metered_connection"
     private const val KEY_SEARCH_HISTORY_ENABLED = "search_history_enabled"

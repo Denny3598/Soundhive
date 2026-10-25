@@ -1873,6 +1873,15 @@ private fun SoundhiveApp(darkTheme: Boolean, viewModel: MainViewModel = viewMode
                     // in place, and people often thumb a song and then queue it.
                     onToggleLike = { viewModel.toggleLike(song.videoId) },
                     onToggleDislike = { viewModel.toggleDislike(song.videoId) },
+                    isOriginalSource = AppSettings.isOriginalSource(song.videoId),
+                    onRevertToOriginal = {
+                        AppSettings.setOriginalSource(song.videoId, true)
+                        songActions = null
+                    },
+                    onUpgradeToHighQuality = {
+                        AppSettings.setOriginalSource(song.videoId, false)
+                        songActions = null
+                    },
                     onAddToPlaylist = {
                         songActions = null
                         viewModel.loadPlaylists()

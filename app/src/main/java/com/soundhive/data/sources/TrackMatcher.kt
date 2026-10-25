@@ -360,7 +360,12 @@ object TrackMatcher {
      * queue row usually does.
      */
     private fun durationScore(wanted: Int?, got: Int?): Int? {
-        if (wanted == null || got == null) return 0
+        // Nothing asked for, nothing to check. But a runtime we asked for that the
+        // candidate does not state is a candidate that cannot be checked, so it is
+        // refused rather than waved through (see [withinSeconds]). Accepting it let
+        // a same-titled remix or extended cut through as the original.
+        if (wanted == null) return 0
+        if (got == null) return null
         val drift = abs(wanted - got)
         return when {
             drift > DURATION_LIMIT_SEC -> null

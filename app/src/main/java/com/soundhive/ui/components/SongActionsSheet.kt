@@ -31,6 +31,8 @@ import androidx.compose.material.icons.rounded.Downloading
 import androidx.compose.material.icons.rounded.ErrorOutline
 import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material.icons.rounded.FavoriteBorder
+import androidx.compose.material.icons.rounded.HighQuality
+import androidx.compose.material.icons.rounded.Restore
 import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material.icons.rounded.PlaylistRemove
 import androidx.compose.material.icons.rounded.Share
@@ -131,6 +133,10 @@ fun SongActionsSheet(
      * as before — present when the id is there, absent when it never was.
      */
     resolvingLinks: Boolean = false,
+    /** True when this track is pinned to YouTube's own copy; picks which source row is shown. */
+    isOriginalSource: Boolean = false,
+    onRevertToOriginal: (() -> Unit)? = null,
+    onUpgradeToHighQuality: (() -> Unit)? = null,
 ) {
     var pickingSleepTimer by remember { mutableStateOf(false) }
     // Read from the thumbnail the row that opened this sheet was already
@@ -202,6 +208,22 @@ fun SongActionsSheet(
             accent = palette.accent,
             onClick = onAddToQueue,
         )
+        onRevertToOriginal?.takeIf { !isOffline && !isOriginalSource }?.let { revert ->
+            ActionRow(
+                icon = Icons.Rounded.Restore,
+                label = "Revert to original",
+                accent = palette.accent,
+                onClick = revert,
+            )
+        }
+        onUpgradeToHighQuality?.takeIf { !isOffline && isOriginalSource }?.let { upgrade ->
+            ActionRow(
+                icon = Icons.Rounded.HighQuality,
+                label = "Upgrade to high quality",
+                accent = palette.accent,
+                onClick = upgrade,
+            )
+        }
         when (val id = song.albumId) {
             null -> if (resolvingLinks) LoadingActionRow(Icons.Rounded.Album, "Open album", palette)
             else -> ActionRow(Icons.Rounded.Album, "Open album", accent = palette.accent) { onOpenAlbum(id) }
