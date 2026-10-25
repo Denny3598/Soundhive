@@ -1,0 +1,33 @@
+﻿# Soundhive Git Ignore
+
+# Gradle
+.gradle/
+build/
+**/build/
+
+# Android local configuration
+local.properties
+
+# Kotlin
+.kotlin/
+
+# Android Studio / IntelliJ
+.idea/
+*.iml
+
+# Native build output
+.externalNativeBuild/
+.cxx/
+
+# Generated files
+*.log
+captures/
+
+# Signing / secrets
+*.jks
+*.keystore
+keystore.properties
+
+# OS files
+.DS_Store
+Thumbs.db
