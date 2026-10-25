@@ -1925,7 +1925,7 @@ class PlaybackService : MediaSessionService() {
         // handing over the search that just cost three attempts would only
         // schedule a fourth.
         if (StreamChoice.substitutesRefused(videoId)) {
-            return Resolved.YouTube(StreamResolver.resolve(videoId))
+            return Resolved.YouTube(StreamResolver.resolve(SongVersion.audioVersionOf(videoId, target)))
         }
         NerdStats.onLosslessRaceStart(videoId)
         // Both legs are parented to the service's scope rather than to the
@@ -1940,8 +1940,9 @@ class PlaybackService : MediaSessionService() {
         // wrapped rather than thrown from: it is awaited only on the paths
         // that need it, and an async that fails without ever being awaited is
         // an unhandled exception in this service's scope.
+        // Plays the song's audio-only upload when one exists, not a music video's mix.
         val fallback = scope.async(Dispatchers.IO + TrackLog.about(videoId)) {
-            runCatching { StreamResolver.resolve(videoId) }
+            runCatching { StreamResolver.resolve(SongVersion.audioVersionOf(videoId, target)) }
         }
 
         // First past the post. A null because [lookup] won is a module miss; a
