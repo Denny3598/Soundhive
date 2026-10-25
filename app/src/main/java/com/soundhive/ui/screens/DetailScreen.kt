@@ -203,7 +203,7 @@ fun DetailScreen(
     }
 
     val screenWidth = LocalConfiguration.current.screenWidthDp.dp
-    val heroArtHeight = if (isArtist) screenWidth / ARTIST_PHOTO_RATIO else 0.dp
+    val heroArtHeight = if (isArtist) screenWidth / ARTIST_PHOTO_RATIO else screenWidth
 
     Box(
         modifier = modifier
@@ -230,8 +230,8 @@ fun DetailScreen(
                     ),
             )
 
-            // If Artist, render the edge-to-edge artist hero backdrop with smooth scrim
-            if (isArtist) {
+            // Edge-to-edge hero backdrop for every detail page (artist, album, playlist, podcast)
+            run {
                 val context = LocalContext.current
                 val heroArtRequest = remember(page.thumbnailUrl) {
                     ImageRequest.Builder(context)
@@ -251,6 +251,16 @@ fun DetailScreen(
                         contentScale = ContentScale.Crop,
                         modifier = Modifier.matchParentSize(),
                     )
+                    // Animated canvas (albums) plays over the full-width art
+                    if (!isArtist) {
+                        canvas?.let { clip ->
+                            CanvasArtworkPlayer(
+                                canvas = clip,
+                                isPlaying = true,
+                                modifier = Modifier.matchParentSize(),
+                            )
+                        }
+                    }
                     // Multi-stop cinematic gradient to deep black
                     Box(
                         modifier = Modifier
@@ -273,7 +283,7 @@ fun DetailScreen(
             state = listState,
             modifier = Modifier.fillMaxSize(),
             contentPadding = PaddingValues(
-                top = if (isArtist) 0.dp else 12.dp,
+                top = 0.dp,
                 bottom = contentPadding.calculateBottomPadding() + 24.dp,
             ),
         ) {
@@ -291,6 +301,7 @@ fun DetailScreen(
                 } else {
                     PlaylistHeroHeader(
                         page = page,
+                        heroHeight = heroArtHeight,
                         songs = songs,
                         canvas = canvas,
                         onPlay = { onSongClick(songs, 0) },
@@ -473,6 +484,7 @@ fun DetailScreen(
 @Composable
 private fun PlaylistHeroHeader(
     page: DetailPage,
+    heroHeight: Dp,
     songs: List<Song>,
     canvas: CanvasArtwork?,
     onPlay: () -> Unit,
@@ -492,48 +504,8 @@ private fun PlaylistHeroHeader(
             .padding(horizontal = HEADER_GUTTER, vertical = 12.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        // Floating Cover Art Card
-        Box(
-            modifier = Modifier
-                .size(220.dp)
-                .soundhiveAmbientBacklight(
-                    color = soundhiveColors.ambientGlow,
-                    radiusDp = 28.dp,
-                    alpha = 0.55f,
-                )
-                .clip(RoundedCornerShape(20.dp))
-                .background(soundhiveColors.glassSurface)
-                .soundhiveSpecularBorder(
-                    shape = RoundedCornerShape(20.dp),
-                    width = 0.8.dp,
-                    topHighlight = soundhiveColors.glassHighlight,
-                    bottomBorder = soundhiveColors.glassBorder,
-                ),
-            contentAlignment = Alignment.Center,
-        ) {
-            val context = LocalContext.current
-            val heroArtRequest = remember(page.thumbnailUrl) {
-                ImageRequest.Builder(context)
-                    .data(page.thumbnailUrl.artworkAt(CARD_ART_PX))
-                    .crossfade(false)
-                    .build()
-            }
-            AsyncImage(
-                model = heroArtRequest,
-                contentDescription = page.title,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxSize(),
-            )
-
-            // Animated canvas if available
-            canvas?.let { clip ->
-                CanvasArtworkPlayer(
-                    canvas = clip,
-                    isPlaying = true,
-                    modifier = Modifier.matchParentSize(),
-                )
-            }
-        }
+        // Cover art is drawn full-width in the backdrop; leave room so text sits over the fade
+        Spacer(Modifier.height((heroHeight - 170.dp).coerceAtLeast(140.dp)))
 
         Spacer(Modifier.height(18.dp))
 
