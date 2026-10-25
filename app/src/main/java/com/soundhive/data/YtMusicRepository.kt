@@ -278,7 +278,10 @@ object YtMusicRepository {
                 .map { (title, browseId) ->
                     async {
                         val items = runCatching {
-                            InnertubeParser.parseLibraryItems(Innertube.browse(browseId))
+                            InnertubeParser.parseLibraryItems(
+                                Innertube.browse(browseId),
+                                includeEpisodes = browseId == LIBRARY_PODCASTS,
+                            )
                         }.getOrDefault(emptyList())
                         HomeShelf(title, items)
                     }
@@ -425,12 +428,15 @@ object YtMusicRepository {
 
     const val PLAYLISTS_SHELF = "Playlists"
 
+    /** Podcast shows and episodes; its rows include playable episodes, not just browse pages. */
+    private const val LIBRARY_PODCASTS = "FEmusic_library_non_music_audio_list"
+
     private val LIBRARY_FEEDS = listOf(
         PLAYLISTS_SHELF to LIBRARY_PLAYLISTS,
         "Albums" to "FEmusic_liked_albums",
         "Artists" to "FEmusic_library_corpus_track_artists",
         "Subscriptions" to "FEmusic_library_corpus_artists",
-        "Podcasts" to "FEmusic_library_non_music_audio_list",
+        "Podcasts" to LIBRARY_PODCASTS,
     )
 
     // ---- Writes -------------------------------------------------------------

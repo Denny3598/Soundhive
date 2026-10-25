@@ -442,20 +442,46 @@ object InnertubeParser {
      * view, and serve `musicTwoRowItemRenderer` cards for one and
      * `musicResponsiveListItemRenderer` rows for the other, so both are read.
      */
-    fun parseLibraryItems(root: JsonElement): List<ShelfItem> {
+    fun parseLibraryItems(root: JsonElement, includeEpisodes: Boolean = false): List<ShelfItem> {
         val out = LinkedHashMap<String, ShelfItem>()
         collectRenderers(root, "musicTwoRowItemRenderer").forEach { renderer ->
             val item = parseTwoRowItem(renderer) ?: return@forEach
-            item.browseId?.let { out.putIfAbsent(it, item) }
+            when {
+                item.browseId != null -> out.putIfAbsent(item.browseId, item)
+                includeEpisodes && item.videoId != null -> out.putIfAbsent("video:${item.videoId}", item)
+            }
         }
         collectRenderers(root, "musicResponsiveListItemRenderer").forEach { renderer ->
-            val item = parseBrowseItem(renderer) ?: return@forEach
-            out.putIfAbsent(
-                item.browseId,
-                ShelfItem(item.title, item.subtitle, item.thumbnailUrl, null, item.browseId),
-            )
+            val item = parseBrowseItem(renderer)?.let {
+                ShelfItem(it.title, it.subtitle, it.thumbnailUrl, null, it.browseId)
+            } ?: parseEpisodeRow(renderer).takeIf { includeEpisodes } ?: return@forEach
+            out.putIfAbsent(item.browseId ?: "video:${item.videoId}", item)
         }
         return out.values.toList()
+    }
+
+    /**
+     * A podcast episode row: it links to a watch page (`watchEndpoint`), not a
+     * browse page, so [parseBrowseItem] skips it. Returned as a playable item.
+     */
+    private fun parseEpisodeRow(renderer: JsonObject): ShelfItem? {
+        val videoId = renderer.o("navigationEndpoint").o("watchEndpoint").s("videoId")
+            ?: renderer.o("playlistItemData").s("videoId")
+            ?: return null
+        val columns = renderer.a("flexColumns").orEmpty()
+        val title = columns.getOrNull(0)
+            .o("musicResponsiveListItemFlexColumnRenderer").o("text").runs()
+        if (title.isBlank()) return null
+        val subtitle = columns.getOrNull(1)
+            .o("musicResponsiveListItemFlexColumnRenderer").o("text").runs()
+        return ShelfItem(
+            title = title,
+            subtitle = subtitle,
+            thumbnailUrl = renderer.o("thumbnail").o("musicThumbnailRenderer")
+                .o("thumbnail").a("thumbnails").best(),
+            videoId = videoId,
+            browseId = null,
+        )
     }
 
     /**
