@@ -50,6 +50,8 @@ import com.soundhive.ui.components.MessageState
 import com.soundhive.ui.components.PAGE_GUTTER
 import com.soundhive.ui.components.PullToRefresh
 import com.soundhive.ui.components.SHELF_CARD_WIDTH
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.unit.Dp
 import com.soundhive.ui.components.librarySkeleton
 import com.soundhive.ui.components.soundhiveSpecularBorder
 import com.soundhive.ui.icons.SoundhiveIcons
@@ -411,7 +413,7 @@ private fun LibraryGridPage(
         }
 
         LazyVerticalGrid(
-            columns = GridCells.Adaptive(SHELF_CARD_WIDTH),
+            columns = GridCells.Adaptive(SEE_ALL_CARD_WIDTH),
             modifier = Modifier.fillMaxWidth(),
             contentPadding = PaddingValues(
                 start = PAGE_GUTTER,
@@ -428,6 +430,7 @@ private fun LibraryGridPage(
                         label = "New playlist",
                         subtitle = "Saved to YouTube Music",
                         onClick = onNewPlaylist,
+                        cardWidth = SEE_ALL_CARD_WIDTH,
                     )
                 }
             }
@@ -441,11 +444,25 @@ private fun LibraryGridPage(
                     onClick = { onItemClick(item) },
                     onLongPress = { onItemLongPress(item) },
                     isPinned = isItemPinned(item),
+                    cardWidth = SEE_ALL_CARD_WIDTH,
+                    titleMaxLines = 3,
+                    titleStyle = SeeAllTitleStyle,
                 )
             }
         }
     }
 }
+
+/** Lebar kartu di halaman "Lihat semua": lebih besar dari kartu rak di Beranda. */
+private val SEE_ALL_CARD_WIDTH = 168.dp
+
+private val SeeAllTitleStyle = TextStyle(
+    fontFamily = Manrope,
+    fontWeight = FontWeight.SemiBold,
+    fontSize = 16.sp,
+    lineHeight = 20.sp,
+    letterSpacing = (-0.1).sp,
+)
 
 /** Judul rak yang dipakai sebagai kunci dan untuk logika khusus. */
 private const val PLAYLISTS = "Playlists"

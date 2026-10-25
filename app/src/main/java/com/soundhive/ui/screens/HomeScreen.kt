@@ -70,6 +70,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
@@ -1860,13 +1861,16 @@ internal fun SoundhiveShelfCard(
     onClick: () -> Unit,
     onLongPress: (() -> Unit)? = null,
     isPinned: Boolean = false,
+    cardWidth: Dp = SHELF_CARD_WIDTH,
+    titleMaxLines: Int = 1,
+    titleStyle: TextStyle = ShelfCardTitleTextStyle,
 ) {
     val soundhiveColors = LocalSoundhiveColors.current
     val interactionSource = remember { MutableInteractionSource() }
 
     Column(
         modifier = Modifier
-            .width(SHELF_CARD_WIDTH)
+            .width(cardWidth)
             .combinedClickable(
                 interactionSource = interactionSource,
                 indication = null,
@@ -1877,7 +1881,7 @@ internal fun SoundhiveShelfCard(
     ) {
         Box(
             modifier = Modifier
-                .width(SHELF_CARD_WIDTH)
+                .width(cardWidth)
                 .aspectRatio(1f),
         ) {
             when {
@@ -2032,9 +2036,9 @@ internal fun SoundhiveShelfCard(
         Spacer(Modifier.height(8.dp))
         Text(
             text = item.title,
-            style = ShelfCardTitleTextStyle,
+            style = titleStyle,
             color = soundhiveColors.textPrimary,
-            maxLines = 1,
+            maxLines = titleMaxLines,
             overflow = TextOverflow.Ellipsis,
         )
         Spacer(Modifier.height(2.dp))
@@ -2057,18 +2061,19 @@ internal fun NewShelfCard(
     label: String,
     subtitle: String,
     onClick: () -> Unit,
+    cardWidth: Dp = SHELF_CARD_WIDTH,
 ) {
     val soundhiveColors = LocalSoundhiveColors.current
     val cardCorner = RoundedCornerShape(16.dp)
 
     Column(
         modifier = Modifier
-            .width(SHELF_CARD_WIDTH)
+            .width(cardWidth)
             .soundhiveTactilePress(onClick = onClick),
     ) {
         Box(
             modifier = Modifier
-                .width(SHELF_CARD_WIDTH)
+                .width(cardWidth)
                 .aspectRatio(1f)
                 .clip(cardCorner)
                 .background(soundhiveColors.glassSurfaceElevated)
