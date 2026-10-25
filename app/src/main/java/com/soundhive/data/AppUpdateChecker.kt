@@ -33,9 +33,10 @@ object AppUpdateChecker {
 
     private const val CACHE_SUBDIR = "updates"
 
-    // Official Soundhive GitHub release endpoint. Kept unconfigured/disabled until
-    // the official Soundhive repository is established.
-    private val LATEST_RELEASE_URL: String? = null
+    // Latest non-prerelease GitHub release of the Soundhive repo. The release tag
+    // is "v<versionName>" (see .github/workflows/build-apk.yml).
+    private const val LATEST_RELEASE_URL: String =
+        "https://api.github.com/repos/Denny3598/Soundhive/releases/latest"
 
     private val json = Json { ignoreUnknownKeys = true }
 
@@ -56,7 +57,7 @@ object AppUpdateChecker {
     private var downloadCancelled = false
 
     suspend fun check() = withContext(Dispatchers.IO) {
-        val endpoint = LATEST_RELEASE_URL ?: return@withContext
+        val endpoint = LATEST_RELEASE_URL
         runCatching {
             val request = Request.Builder()
                 .url(endpoint)

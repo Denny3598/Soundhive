@@ -50,10 +50,12 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          VERSION=$(grep -oP 'versionName = "\K[^"]+' app/build.gradle.kts)
           gh release delete latest --cleanup-tag --yes || true
-          gh release create latest Soundhive.apk \
+          gh release delete "v$VERSION" --cleanup-tag --yes || true
+          gh release create "v$VERSION" Soundhive.apk \
             --target "$GITHUB_SHA" \
-            --title "Soundhive (latest build)" \
+            --title "Soundhive v$VERSION" \
             --notes "Build debug otomatis dari commit ${GITHUB_SHA:0:7}." \
             --latest
 
