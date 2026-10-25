@@ -822,19 +822,6 @@ fun SettingsScreen(
             }
             RowDivider()
             SettingsRow(
-                icon = Icons.Rounded.Animation,
-                title = "Animated Canvas",
-                subtitle = "Display looped video canvases from Spotify Canvas",
-                trailing = {
-                    SoundhiveSwitch(
-                        checked = animatedCanvas,
-                        onCheckedChange = AppSettings::setAnimatedCanvas,
-                    )
-                },
-                onClick = { AppSettings.setAnimatedCanvas(!animatedCanvas) },
-            )
-            RowDivider()
-            SettingsRow(
                 icon = Icons.Rounded.VpnKey,
                 title = "Spotify Canvas authorization",
                 subtitle = if (spotifyToken.isNotBlank()) "Spotify session active" else "Authenticate with Spotify for background video canvases",

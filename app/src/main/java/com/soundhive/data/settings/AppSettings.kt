@@ -215,7 +215,8 @@ object AppSettings {
      * but it is the better default, and most tracks resolve to no canvas at
      * all. See [CanvasRepository][com.soundhive.data.canvas.CanvasRepository].
      */
-    val animatedCanvas = MutableStateFlow(true)
+    // Animated canvas (looping video artwork) is disabled for everyone: playback is audio only.
+    val animatedCanvas = MutableStateFlow(false)
     val spotifySpdcToken = MutableStateFlow("")
     val spotifyToken: MutableStateFlow<String> get() = spotifySpdcToken
 
@@ -475,7 +476,7 @@ object AppSettings {
         uiGlow.value = prefs.getBoolean(KEY_UI_GLOW, false)
         glassEffects.value = prefs.getBoolean(KEY_GLASS_EFFECTS, !prefs.getBoolean(KEY_REDUCE_BLUR, false))
         liquidGlassBlur.value = prefs.getBoolean(KEY_LIQUID_GLASS_BLUR, true)
-        animatedCanvas.value = prefs.getBoolean(KEY_ANIMATED_CANVAS, true)
+        animatedCanvas.value = false
         spotifySpdcToken.value = prefs.getString(KEY_SPOTIFY_SPDC_TOKEN, "").orEmpty()
         outputPcmMode.value = runCatching {
             OutputPcmMode.valueOf(prefs.getString(KEY_OUTPUT_PCM_MODE, null) ?: OutputPcmMode.PCM_16.name)
@@ -883,9 +884,10 @@ object AppSettings {
         prefs.edit().putInt(KEY_LYRICS_SYNC_OFFSET, value).apply()
     }
 
-    fun setAnimatedCanvas(value: Boolean) {
-        animatedCanvas.value = value
-        prefs.edit().putBoolean(KEY_ANIMATED_CANVAS, value).apply()
+    /** Kept for backup/restore compatibility; the canvas stays off whatever is passed. */
+    fun setAnimatedCanvas(@Suppress("UNUSED_PARAMETER") value: Boolean) {
+        animatedCanvas.value = false
+        prefs.edit().putBoolean(KEY_ANIMATED_CANVAS, false).apply()
     }
 
     fun setSpotifySpdcToken(value: String) {
