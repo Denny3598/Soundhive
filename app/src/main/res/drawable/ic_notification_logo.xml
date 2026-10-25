@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Ikon notifikasi Soundhive: hexagon dengan batang equalizer berlubang. Monokrom, sesuai aturan Android. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:fillType="evenOdd"
+        android:pathData="M12,2.5 L20.2,7.25 L20.2,16.75 L12,21.5 L3.8,16.75 L3.8,7.25 Z
+            M7.0,9.5 H8.2 V14.5 H7.0 Z
+            M9.2,8.5 H10.4 V15.5 H9.2 Z
+            M11.4,6.5 H12.6 V17.5 H11.4 Z
+            M13.6,8.5 H14.8 V15.5 H13.6 Z
+            M15.8,9.5 H17.0 V14.5 H15.8 Z" />
+</vector>
