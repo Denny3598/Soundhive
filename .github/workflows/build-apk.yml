@@ -32,9 +32,17 @@ jobs:
       - name: Siapkan kunci tanda tangan
         env:
           SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
+          ALIAS: ${{ secrets.ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          KEY_STORE_PASSWORD: ${{ secrets.KEY_STORE_PASSWORD }}
         run: |
           echo "$SIGNING_KEY" | base64 -d > "$RUNNER_TEMP/bytebeat.jks"
           echo "KEYSTORE_PATH=$RUNNER_TEMP/bytebeat.jks" >> "$GITHUB_ENV"
+          # Read by app/build.gradle.kts so the debug APK is signed with the same key every run.
+          echo "storeFile=$RUNNER_TEMP/bytebeat.jks" > keystore.properties
+          echo "storePassword=$KEY_STORE_PASSWORD" >> keystore.properties
+          echo "keyAlias=$ALIAS" >> keystore.properties
+          echo "keyPassword=$KEY_PASSWORD" >> keystore.properties
 
       - name: Build debug APK
         env:

@@ -96,6 +96,13 @@ android {
             // app-release-unsigned.apk instead of failing outright.
             signingConfig = signingConfigs.findByName("release")
         }
+        // Debug builds use the same key as release when keystore.properties exists.
+        // Android's default per-machine debug key differs on every CI runner, and an
+        // APK signed with a different key cannot update an installed copy without
+        // uninstalling it first.
+        debug {
+            signingConfig = signingConfigs.findByName("release")
+        }
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
