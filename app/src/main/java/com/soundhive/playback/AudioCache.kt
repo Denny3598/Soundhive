@@ -233,6 +233,15 @@ object AudioCache {
      * about to re-open the track can be sure the old bytes are gone first.
      * Call it off the main thread.
      */
+    /**
+     * Drops every cached copy of [videoId], whichever source it came from. A
+     * cache hit never reaches the resolver, so a source change only takes effect
+     * once the old bytes are gone. Runs in the background.
+     */
+    fun discardTrack(videoId: String) {
+        scope.launch { discard(Uri.parse("bitchord://watch?v=$videoId")) }
+    }
+
     fun discard(uri: Uri) {
         val exact = keyFactory.buildCacheKey(DataSpec(uri))
         val about = mediaIdIn(uri)

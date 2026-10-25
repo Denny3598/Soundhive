@@ -116,6 +116,7 @@ import com.soundhive.data.model.UiState
 import com.soundhive.data.model.UserPlaylist
 import com.soundhive.data.scrobbling.LastFM
 import com.soundhive.data.settings.AppSettings
+import com.soundhive.playback.AudioCache
 import com.soundhive.data.settings.ThemeMode
 import com.soundhive.data.sources.SourceRegistry
 import com.soundhive.data.sources.TrackMatcher
@@ -1876,10 +1877,12 @@ private fun SoundhiveApp(darkTheme: Boolean, viewModel: MainViewModel = viewMode
                     isOriginalSource = AppSettings.isOriginalSource(song.videoId),
                     onRevertToOriginal = {
                         AppSettings.setOriginalSource(song.videoId, true)
+                        AudioCache.discardTrack(song.videoId)
                         songActions = null
                     },
                     onUpgradeToHighQuality = {
                         AppSettings.setOriginalSource(song.videoId, false)
+                        AudioCache.discardTrack(song.videoId)
                         songActions = null
                     },
                     onAddToPlaylist = {
